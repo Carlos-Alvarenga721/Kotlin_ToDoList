@@ -6,8 +6,11 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 
-class TaskAdapter(private val tasks: List<Task>) :
-    RecyclerView.Adapter<TaskAdapter.TaskViewHolder>() {
+class TaskAdapter(
+    private val tasks: List<Task>,
+    private val onItemClick: (Task) -> Unit,
+    private val onItemLongClick: (Task) -> Unit
+) : RecyclerView.Adapter<TaskAdapter.TaskViewHolder>() {
 
     class TaskViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val taskTitle: TextView = itemView.findViewById(R.id.taskTitle)
@@ -24,7 +27,15 @@ class TaskAdapter(private val tasks: List<Task>) :
         val task = tasks[position]
         holder.taskTitle.text = task.title
         holder.taskDescription.text = task.description
-    }
 
+        holder.itemView.setOnClickListener {
+            onItemClick(task)
+        }
+
+        holder.itemView.setOnLongClickListener {
+            onItemLongClick(task)
+            true
+        }
+    }
     override fun getItemCount(): Int = tasks.size
 }

@@ -51,11 +51,12 @@ class MainActivity : AppCompatActivity() {
         recyclerView = findViewById(R.id.todoRecyclerView)
         fab = findViewById(R.id.addTaskFab)
 
-        // Simulamos algunas tareas para probar
-        taskList.add(Task(title = "Hacer tarea", description = "Terminar app DSM104"))
-        taskList.add(Task(title = "Ir al gym", description = "Entrenar espalda"))
 
-        taskAdapter = TaskAdapter(taskList)
+        taskAdapter = TaskAdapter(taskList,
+            onItemClick = { task -> showEditDialog(task) },
+            onItemLongClick = { task -> showDeleteDialog(task) }
+        )
+
         recyclerView.layoutManager = LinearLayoutManager(this)
         recyclerView.adapter = taskAdapter
 
@@ -134,5 +135,61 @@ class MainActivity : AppCompatActivity() {
         })
     }
 
+    private fun showDeleteDialog(task: Task) {
+        AlertDialog.Builder(this)
+            .setTitle("Eliminar tarea")
+            .setMessage("¿Estás seguro de que quieres eliminar esta tarea?")
+            .setPositiveButton("Sí") { _, _ ->
+                val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return@setPositiveButton
+                FirebaseDatabase.getInstance().getReference("tasks")
+                    .child(userId)
+                    .child(task.id)
+                    .removeValue()
+                    .addOnSuccessListener {
+                        Toast.makeText(this, "Tarea eliminada", Toast.LENGTH_SHORT).show()
+                    }
+            }
+            .setNegativeButton("Cancelar", null)
+            .show()
+    }
+
+    private fun showEditDialog(task: Task) {
+        val dialogView = layoutInflater.inflate(R.layout.dialog_add_task, null)
+        val titleEditText = dialogView.findViewById<EditText>(R.id.taskTitleEditText)
+        val descriptionEditText = dialogView.findViewById<EditText>(R.id.taskDescriptionEditText)
+
+        titleEditText.setText(task.title)
+        descriptionEditText.setText(task.description)
+
+        AlertDialog.Builder(this)
+            .setTitle("Editar tarea")
+            .setView(dialogView)
+            .setPositiveButton("Actualizar") { _, _ ->
+                val updatedTitle = titleEditText.text.toString().trim()
+                val updatedDescription = descriptionEditText.text.toString().trim()
+
+                if (updatedTitle.isEmpty()) {
+                    Toast.makeText(this, "El título es obligatorio", Toast.LENGTH_SHORT).show()
+                    return@setPositiveButton
+                }
+
+                val updatedTask = task.copy(
+                    title = updatedTitle,
+                    description = updatedDescription
+                )
+
+                val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return@setPositiveButton
+
+                FirebaseDatabase.getInstance().getReference("tasks")
+                    .child(userId)
+                    .child(task.id)
+                    .setValue(updatedTask)
+                    .addOnSuccessListener {
+                        Toast.makeText(this, "Tarea actualizada", Toast.LENGTH_SHORT).show()
+                    }
+            }
+            .setNegativeButton("Cancelar", null)
+            .show()
+    }
 
 }
