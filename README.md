@@ -17,8 +17,6 @@ application on a to-do list, in which Firebase Authentication was implemented fo
 
 ```bash
 # Clone the repo
-git clone https://github.com/your-username/your-repo-name.git
-
-
+git clone https://github.com/Carlos-Alvarenga721/Kotlin_ToDoList
 
 # Open in Android Studio and run the app
