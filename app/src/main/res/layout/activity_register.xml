@@ -7,7 +7,7 @@
     android:layout_height="match_parent"
     tools:context=".Register"
     android:padding="24dp"
-    android:background="@color/white2">
+    android:background="@color/whitegreen">
 
     <TextView
         android:id="@+id/register_title"
@@ -76,7 +76,7 @@
         android:layout_height="wrap_content"
         android:text="Registrarse"
         android:textColor="@color/white"
-        android:backgroundTint="@color/greenlight"
+        android:backgroundTint="@color/brown"
         app:layout_constraintTop_toBottomOf="@id/confirmPassword"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

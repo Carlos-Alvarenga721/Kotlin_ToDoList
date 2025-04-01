@@ -52,10 +52,13 @@ class MainActivity : AppCompatActivity() {
         fab = findViewById(R.id.addTaskFab)
 
 
-        taskAdapter = TaskAdapter(taskList,
+        taskAdapter = TaskAdapter(
+            taskList,
             onItemClick = { task -> showEditDialog(task) },
-            onItemLongClick = { task -> showDeleteDialog(task) }
+            onItemLongClick = { task -> showDeleteDialog(task) },
+            onDeleteClick = { task -> showDeleteDialog(task) } // ← también reutilizamos el diálogo
         )
+
 
         recyclerView.layoutManager = LinearLayoutManager(this)
         recyclerView.adapter = taskAdapter
@@ -118,19 +121,29 @@ class MainActivity : AppCompatActivity() {
         val ref = FirebaseDatabase.getInstance().getReference("tasks").child(userId)
 
         ref.addValueEventListener(object : ValueEventListener {
+
             override fun onDataChange(snapshot: DataSnapshot) {
-                taskList.clear() // Limpiamos la lista actual
+                taskList.clear()
 
                 for (taskSnapshot in snapshot.children) {
                     val task = taskSnapshot.getValue(Task::class.java)
-                    task?.let { taskList.add(it) }
+                    task?.let {
+                        it.id = taskSnapshot.key ?: ""
+
+                        // ✅ Reasegura que isCompleted se lea correctamente
+                        if (taskSnapshot.hasChild("isCompleted")) {
+                            it.isCompleted = taskSnapshot.child("isCompleted").getValue(Boolean::class.java) == true
+                        }
+
+                        taskList.add(it)
+                    }
                 }
 
                 taskAdapter.notifyDataSetChanged()
             }
 
             override fun onCancelled(error: DatabaseError) {
-                Toast.makeText(this@MainActivity, "Error al cargar tareas", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this@MainActivity, "Cerro Sesion con Exito", Toast.LENGTH_SHORT).show()
             }
         })
     }
