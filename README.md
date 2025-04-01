@@ -4,9 +4,8 @@ application on a to-do list, in which Firebase Authentication was implemented fo
 
 ## 🚀 Features
 
-- Create an Activity
-- 
-- Feature 3
+- the ability to create an account, log in, and log out if you wish
+- Stores activities to add, edit, delete, or mark as completed
 
 ## 🛠️ Technologies Used
 
